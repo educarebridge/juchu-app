@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>受注伝票 参照</title>
+
+<style>
+    body { font-family: sans-serif; margin: 20px; color: #333; }
+    .slip-container { margin-bottom: 40px; padding: 15px; border: 2px solid #666; border-radius: 5px; background-color: #fff; }
+    table { border-collapse: collapse; margin-bottom: 15px; width: 100%; max-width: 1200px; }
+    th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; font-size: 14px; }
+    th { background-color: #f2f2f2; }
+    
+    .align-right { text-align: right; }
+    .align-center { text-align: center; }
+    .flex-container { display: flex; justify-content: space-between; max-width: 1200px; align-items: center; }
+    
+    .btn-area { margin-top: 20px; margin-bottom: 20px; }
+    .btn { padding: 8px 20px; font-size: 16px; cursor: pointer; text-decoration: none; background-color: #007bff; color: white; border: none; border-radius: 4px; display: inline-block; }
+    .btn:hover { background-color: #0056b3; }
+
+    /* 印刷用スタイル */
+    @media print {
+        .btn-area { display: none; }
+        .slip-container { page-break-after: always; border: 1px solid #000; }
+    }
+</style>
+</head>
+
+<body>
+
+    <h2>取り込み済み 受注伝票一覧</h2>
+
+    <div class="btn-area">
+        <a th:href="@{/csv_upload}" class="btn">CSV再アップロード画面へ戻る</a>
+        <button type="button" class="btn" style="background-color: #28a745;" onclick="window.print()">この画面を印刷</button>
+    </div>
+
+    <!-- 伝票ごとに繰り返し表示（headerList ループ） -->
+    <div th:each="header : ${headerList}" class="slip-container">
+
+        <div class="flex-container">
+            <h3>受注伝票(x19)</h3>
+            <div class="align-right">
+                <table>
+                    <tr>
+                        <th>伝票番号 / WORK ID</th>
+                    </tr>
+                    <tr>
+                        <td class="align-center"><strong th:text="${header.denpyoId}">1001</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- ヘッダー情報1：担当者・日付 -->
+        <table>
+            <thead>
+                <tr>
+                    <th>担当番号</th>
+                    <th>担当名</th>
+                    <th>受注日</th>
+                    <th>製造日</th>
+                    <th>納品日</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td th:text="${header.tantoNo}">101</td>
+                    <td th:text="${header.tantoName}">山田</td>
+                    <td th:text="${header.juchuDate}">2026-07-12</td>
+                    <td th:text="${header.seizoDate}">2026-07-12</td>
+                    <td th:text="${header.nouhinDate}">2026-07-13</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ヘッダー情報2：得意先・部門・店舗 -->
+        <table>
+            <thead>
+                <tr>
+                    <th>お得意先番号</th>
+                    <th>お得意先名</th>
+                    <th>部門番号</th>
+                    <th>部門名</th>
+                    <th>店舗番号</th>
+                    <th>店舗名</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td th:text="${header.tokuiNo}">0001</td>
+                    <td th:text="${header.tokuiName}">○○商事</td>
+                    <td th:text="${header.bumonNo}">01</td>
+                    <td th:text="${header.bumonName}">営業部</td>
+                    <td th:text="${header.tenpoNo}">001</td>
+                    <td th:text="${header.tenpoName}">本店</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+        <h4>明細情報</h4>
+        
+        <!-- 明細テーブル -->
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">行</th>
+                    <th>品番</th>
+                    <th>品名</th>
+                    <th class="align-right">数量</th>
+                    <th class="align-center">単位</th>
+                    <th class="align-right">納品単価</th>
+                    <th class="align-right">金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 明細リスト ループ -->
+                <tr th:each="detail, stat : ${header.details}">
+                    <td class="align-center" th:text="${stat.count}">1</td>
+                    <td th:text="${detail.hinban}">HB001</td>
+                    <td th:text="${detail.hinmei}">和風弁当</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(detail.quantity, 1, 'COMMA')}">10</td>
+                    <td class="align-center" th:text="${detail.unitName}">個</td>
+                    <td class="align-right" th:text="${#numbers.formatDecimal(detail.unitPrice, 1, 'COMMA', 0, 'POINT')}">500</td>
+                    <td class="align-right" th:text="${#numbers.formatDecimal(detail.amount, 1, 'COMMA', 0, 'POINT')}">5,000</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <!-- 合計 -->
+        <table>
+            <thead>
+                <tr>
+                    <th class="align-right">数量計</th>
+                    <th class="align-right">金額計</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="align-right">
+                        <strong th:text="${header.suryokei != null ? #numbers.formatInteger(header.suryokei, 1, 'COMMA') : '0'}">0</strong>
+                    </td>
+                    <td class="align-right">
+                        <!-- formatDecimal を formatInteger にするとすっきりします -->
+                        <strong th:text="${header.kingakukei != null ? #numbers.formatInteger(header.kingakukei, 1, 'COMMA') : '0'}">0</strong>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>

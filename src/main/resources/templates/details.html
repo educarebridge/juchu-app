@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>受注明細一覧</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-4">
+
+    <h2 class="mb-4">受注明細一覧（全件表示）</h2>
+    
+    <div class="alert alert-info">
+        現在の表示件数: <strong th:text="${details.size()}">0</strong> 件
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>明細ID</th>
+                    <th>伝票ID</th>
+                    <th>品番選択</th>
+                    <th>品番</th>
+                    <th>品番２</th>
+                    <th>品番３</th>
+                    <th>品名</th>
+                    <th>規格</th>
+                    <th>発注単位</th>
+                    <th>納品単価</th>
+                    <th>数量</th>
+                    <th>単位</th>
+                    <th>金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="detail : ${details}">
+                    <td th:text="${detail.meisaiId}">622933</td>
+                    <td th:text="${detail.denpyoId}">117816</td>
+                    <td th:text="${detail.hinbanKensaku}">-</td>
+                    <td th:text="${detail.hinban}">882000</td>
+                    <td th:text="${detail.hinban2}">4560448219359</td>
+                    <td th:text="${detail.hinban3}">-</td>
+                    <td th:text="${detail.hinmei}">鍋野菜セット</td>
+                    <td th:text="${detail.kikaku}">-</td>
+                    <td th:text="${detail.hacchuTani}">5</td>
+                    <td th:text="${#numbers.formatInteger(detail.unitPrice, 1, 'COMMA')}">1,346</td>
+                    <td th:text="${detail.quantity}">5</td>
+                    <td th:text="${detail.unitName}">袋</td>
+                    <td th:text="${#numbers.formatInteger(detail.amount, 1, 'COMMA')}">6,730</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

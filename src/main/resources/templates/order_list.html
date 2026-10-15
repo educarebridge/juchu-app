@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>取り込み済み 受注伝票一覧</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+        .btn-form {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        .btn-form:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <h2>取り込み済み 受注伝票一覧（データシート）</h2>
+
+    <!-- 戻るボタンの追加 -->
+    <div style="margin-bottom: 15px;">
+        <a th:href="@{/csv/menu}" class="btn">← CSVメニューへ戻る</a>
+        <a th:href="@{/}" class="btn">メインメニューへ戻る</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>操作</th>
+                <th>伝票ID</th>
+                <th>担当名</th>
+                <th>受注日</th>
+                <th>製造日</th>
+                <th>納品日</th>
+                <th>お得意先名</th>
+                <th>部門名</th>
+                <th>店舗名</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${orderList}">
+                <!-- 1. フォームボタン：workId パラメータ付きで order_detail へ遷移 -->
+                <td>
+                    <a th:href="@{/order/slip(denpyoId=${item.denpyoId})}" class="btn-form">伝票表示</a>
+                </td>
+                <td th:text="${item.denpyoId}">1</td>
+
+                <td th:text="${item.tantoName}">担当名</td>
+                <td th:text="${item.juchuDate}">2033-01-19</td>
+                <td th:text="${item.seizoDate}">2033-01-19</td>
+                <td th:text="${item.nouhinDate}">2033-01-20</td>
+                <td th:text="${item.tokuiName}">お得意先名</td>
+                <td th:text="${item.bumonName}">部門名</td>
+                <td th:text="${item.tenpoName}">店舗名</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

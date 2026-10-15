@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>読込みデータ一覧</title>
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>読込みデータ一覧（データシート）</h2>
+
+    <div style="margin-bottom: 15px;">
+
+        <a th:href="@{/csv/menu}" class="btn">
+            ← CSVメニューへ戻る
+        </a>
+
+        <a th:href="@{/}" class="btn">
+            メインメニューへ戻る
+        </a>
+
+    </div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>伝票ID</th>
+                <th>伝票番号</th>
+                <th>担当名</th>
+                <th>受注日</th>
+                <th>製造日</th>
+                <th>納品日</th>
+                <th>お得意先名</th>
+                <th>部門名</th>
+                <th>店舗名</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr th:each="item : ${workOrderList}">
+
+                <td th:text="${item.denpyoId}"></td>
+
+                <td th:text="${item.denpyoNo}"></td>
+
+                <td th:text="${item.tantoName}"></td>
+
+                <td th:text="${item.juchuDate}"></td>
+
+                <td th:text="${item.seizoDate}"></td>
+
+                <td th:text="${item.nouhinDate}"></td>
+
+                <td th:text="${item.tokuiName}"></td>
+
+                <td th:text="${item.bumonName}"></td>
+
+                <td th:text="${item.tenpoName}"></td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</body>
+</html>

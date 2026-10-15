@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>受注伝票 入力（テスト）</title>
+</head>
+<body>
+
+<h2>受注伝票 入力（テスト）</h2>
+
+<!-- 送信先(action)がControllerの@PostMappingと一致している必要があります -->
+<form th:action="@{/juchu_input}" method="post">
+
+    <label for="juchu_date">受注日:</label>
+    <input type="date" id="juchu_date" name="juchu_date" required />
+    <label for="seizo_date">製造日:</label>
+    <input type="date" id="seizo_date" name="seizo_date" required />
+    <label for="nouhin_date">納品日:</label>
+    <input type="date" id="nouhin_date" name="nouhin_date" required />
+    <p>得意先検索: <input type="text" name="tokui_kensaku" value="テスト" /></p>
+    <p>得意先コード: <input type="text" name="tokui_no" value="1234" /></p>
+    <p>得意先名: <input type="text" name="tokui_name" value="株式会社 テスト" /></p>
+
+    <p>部門番号: <input type="text" name="bumon_no" value="310" /></p>
+    <p>部門: <input type="text" name="bumon_name" value="野菜" /></p>
+
+    <p>店舗番号: <input type="text" name="tenpo_no" value="46" /></p>
+    <p>店舗: <input type="text" name="tenpo_name" value="淡路店" /></p>
+
+    <p>担当番号: <input type="text" name="tanto_no" value="1" /></p>
+    <p>担当先名: <input type="text" name="tanto_name" value="すい" /></p>
+
+    <p>摘要: <input type="text" name="tekiyo" value="ああああああ" /></p>
+
+    <h3>■ 明細情報（1行目）</h3>
+
+    <p>品番検索: <input type="text" name="hinban_kensaku" value="ミックス" /></p>
+    <p>品番: <input type="text" name="hinban" value="882000" /></p>
+    <p>品番2: <input type="text" name="hinban2" value="4560448219366" /></p>
+    <p>品番3: <input type="text" name="hinban3" value="123456" /></p>
+
+    <p>品名: <input type="text" name="hinmei" value="レモン" /></p>
+
+    <p>規格: <input type="text" name="kikaku" value="170g" /></p>
+    <p>発注単位: <input type="number" name="hacchu_tani" value="3" /></p>
+
+    <p>数量: <input type="number" name="quantity" value="5" /></p>
+    <p>単位: <input type="text" name="unit_name" value="個" /></p>
+    <p>単価: <input type="number" name="unit_price" value="100" /></p>
+    <p>金額: <input type="number" name="amount" value="500" /></p>
+
+
+    <button type="submit">PostgreSQLに登録する</button>
+</form>
+
+</body>
+</html>

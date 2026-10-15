@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>受注入力</title>
+
+<style>
+    body { font-family: sans-serif; margin: 20px; color: #333; }
+    table { border-collapse: collapse; margin-bottom: 15px; width: 100%; max-width: 1200px; }
+    th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; font-size: 14px; }
+    th { background-color: #f2f2f2; }
+    
+    .align-right { text-align: right; }
+    .flex-container { display: flex; justify-content: space-between; max-width: 1200px; }
+    
+    input[type="text"], input[type="date"], input[type="number"], select { padding: 4px; box-sizing: border-box; }
+    input[readonly] { background-color: #e9ecef; }
+    
+    .btn-area { margin-top: 20px; }
+    .btn { padding: 8px 20px; font-size: 16px; cursor: pointer; margin-right: 10px; }
+    
+    .search-select { width: 100%; min-width: 150px; }
+    .w-full { width: 100%; }
+</style>
+</head>
+
+<body>
+
+<form th:action="@{/juchu/save}" th:object="${juchuForm}" method="post">
+
+    <div class="flex-container">
+        <h2>受注伝票入力(x19)</h2>
+        <div class="align-right">
+            <table>
+                <tr>
+                    <th>伝票ID</th>
+                </tr>
+                <tr>
+                    <td><input type="text" name="denpyoId" size="15" readonly placeholder="自動採番"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+        <!-- ヘッダー情報1：担当者・伝票番号・摘要 -->
+        <table>
+            <thead>
+                <tr>
+                    <th>担当番号 (選択可)</th>
+                    <th>担当名</th>
+                    <th>伝票番号</th>
+                    <th>摘要</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="text"
+                            id="tantoNo"
+                            name="tantoNo"
+                            list="tantoList"
+                            placeholder="入力または選択"
+                            th:field="*{tantoNo}"
+                            size="15"
+                            oninput="selectTanto()">
+
+                        <datalist id="tantoList">
+                            <option th:each="tanto : ${tantoList}"
+                                    th:value="${tanto.tantoNo}"
+                                    th:data-name="${tanto.tantoName}"
+                                    th:text="|${tanto.tantoNo} : ${tanto.tantoName}|">
+                            </option>
+                        </datalist>
+                    </td>
+
+                    <td>
+                        <input type="text"
+                            id="tantoName"
+                            name="tantoName"
+                            size="15"
+                            value="すい">
+                    </td>
+
+                    <td>
+                        <input type="text"
+                            th:field="*{denpyoNo}"
+                            id="denpyoNo"
+                            size="15"
+                            placeholder="入力不要可">
+                    </td>
+
+                    <td>
+                        <input type="text"
+                            th:field="*{tekiyo}"
+                            id="tekiyo"
+                            size="20"
+                            placeholder="必要な場合入力">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 日付 -->
+        <table>
+            <thead>
+                <tr>
+                    <th>受注日</th>
+                    <th>製造日</th>
+                    <th>納品日</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="date" th:field="*{juchuDate}">
+                    </td>
+                    <td>
+                        <input type="date" th:field="*{seizoDate}">
+                    </td>
+                    <td>
+                        <input type="date" th:field="*{nouhinDate}">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    <!-- ヘッダー情報2：得意先・部門・店舗 -->
+    <table>
+
+        <thead>
+            <tr>
+                <th>お得意先検索</th>
+                <th>お得意先番号</th>
+                <th>お得意先名</th>
+                <th>部門番号 (選択可)</th>
+                <th>部門名</th>
+                <th>店舗番号 (選択可)</th>
+                <th>店舗名</th>
+            </tr>
+        </thead>
+
+
+        <tbody>
+            <tr>
+                <!-- お得意先検索 -->
+                <td>
+                    <input type="text"
+                        id="tokuiSearch"
+                        placeholder="お得意先名を検索"
+                        size="18"
+                        autocomplete="off">
+
+                <div id="tokuiSearchResults"></div>
+
+                </td>
+
+
+                <!-- お得意先番号 -->
+
+                <td> <select th:field="*{tokuiNo}" id="tokuiNo" size="1"> <option value="">選択してください</option>
+
+                    <option th:each="tokui : ${tokuiList}"
+                            th:value="${tokui.tokuiNo}"
+                            th:data-name="${tokui.tokuiName}"
+                            th:text="|${tokui.tokuiNo}　${tokui.tokuiName}|">
+                    </option>
+                </select>
+
+                </td>
+
+                <!-- お得意先名 -->
+
+                <td> <input type="text" th:field="*{tokuiName}" id="tokuiName" readonly size="20"> </td>
+
+
+                <!-- 部門（datalist選択 & 手入力対応） -->
+                <td>
+                    <input type="text" th:field="*{bumonNo}" id="bumonNo" list="bumonOptions" placeholder="入力または選択" size="12" oninput="selectBumon()">
+                    <datalist id="bumonOptions">
+                        <option th:each="b : ${bumonList}"
+                                th:value="${b.bumonNo}"
+                                th:label="${b.bumonName}"
+                                th:data-name="${b.bumonName}">
+                        </option>
+                    </datalist>
+                </td>
+                <td><input type="text" th:field="*{bumonName}" id="bumonName" size="14" placeholder="手入力可"></td>
+
+                <!-- 店舗（datalist選択 & 手入力対応） -->
+                <td>
+                    <input type="text" th:field="*{tenpoNo}" id="tenpoNo" list="tenpoList" placeholder="入力または選択" size="14" autocomplete="off" oninput="selectTenpo()">
+                    <datalist id="tenpoList"></datalist>
+                </td>
+                <td><input type="text" th:field="*{tenpoName}" id="tenpoName" size="16" placeholder="手入力可"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+    <h3>明細情報</h3>
+    
+    <table id="detailTable">
+        <thead>
+            <tr>
+                <th>品名検索</th>
+                <th>品番 (自動)</th>
+                <th>品名 (自動)</th>
+                <th>数量</th>
+                <th>単位</th>
+                <th>納品単価</th>
+                <th>金額</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 行1 -->
+            <tr class="detail-row">
+                <td>
+                    <input type="text" class="hin-search" name="details[0].hinbanKensaku" placeholder="例: 和風" oninput="filterHinmei(this)" size="12">
+                </td>
+                <td>
+                    <select class="search-select" th:field="*{details[0].hinban}" onchange="selectHinban(this)">
+                        <option value="">-- 品番選択 --</option>
+                        <option th:each="shohin : ${shohinList}"
+                                th:value="${shohin.hinban}"
+                                th:text="${shohin.hinban + ' : ' + shohin.hinmei}"
+                                th:data-name="${shohin.hinmei}"
+                                th:data-tanka="${shohin.unitPrice}"
+                                th:data-tani="${shohin.unitName}"
+                                th:data-tokui-no="${shohin.tokuiNo}">
+                        </option>
+                    </select>
+                </td>
+                <td><input type="text" name="details[0].hinmei" readonly size="22"></td>
+                <td><input type="number" name="details[0].quantity" min="0" value="" oninput="calculateAmount(this)" style="width: 60px;"></td>
+                <td><input type="text" name="details[0].unitName" readonly size="5"></td>
+                <td><input type="number" name="details[0].unitPrice" oninput="calculateAmount(this)" style="width: 80px;"></td>
+                <td><input type="text" name="details[0].amount" class="align-right" size="10"></td>
+            </tr>
+            <!-- 行2 -->
+            <tr class="detail-row">
+                <td><input type="text" class="hin-search" name="details[1].hinbanKensaku" placeholder="例: 和風" oninput="filterHinmei(this)" size="12"></td>
+                <td>
+                    <select class="search-select" th:field="*{details[1].hinban}" onchange="selectHinban(this)">
+                        <option value="">-- 品番選択 --</option>
+                        <option th:each="shohin : ${shohinList}"
+                                th:value="${shohin.hinban}"
+                                th:text="${shohin.hinban + ' : ' + shohin.hinmei}"
+                                th:data-name="${shohin.hinmei}"
+                                th:data-tanka="${shohin.unitPrice}"
+                                th:data-tani="${shohin.unitName}"
+                                th:data-tokui-no="${shohin.tokuiNo}">
+                        </option>
+                    </select>
+                </td>
+                <td><input type="text" name="details[1].hinmei" readonly size="22"></td>
+                <td><input type="number" name="details[1].quantity" min="0" value="" oninput="calculateAmount(this)" style="width: 60px;"></td>
+                <td><input type="text" name="details[1].unitName" readonly size="5"></td>
+                <td><input type="number" name="details[1].unitPrice" oninput="calculateAmount(this)" style="width: 80px;"></td>
+                <td><input type="text" name="details[1].amount" readonly class="align-right" size="10"></td>
+            </tr>
+            <!-- 行3 -->
+            <tr class="detail-row">
+                <td><input type="text" class="hin-search" name="details[2].hinbanKensaku" placeholder="例: 和風" oninput="filterHinmei(this)" size="12"></td>
+                <td>
+                    <select class="search-select" th:field="*{details[2].hinban}" onchange="selectHinban(this)">
+                        <option value="">-- 品番選択 --</option>
+                        <option th:each="shohin : ${shohinList}"
+                                th:value="${shohin.hinban}"
+                                th:text="${shohin.hinban + ' : ' + shohin.hinmei}"
+                                th:data-name="${shohin.hinmei}"
+                                th:data-tanka="${shohin.unitPrice}"
+                                th:data-tani="${shohin.unitName}"
+                                th:data-tokui-no="${shohin.tokuiNo}">
+                        </option>
+                    </select>
+                </td>
+                <td><input type="text" name="details[2].hinmei" readonly size="22"></td>
+                <td><input type="number" name="details[2].quantity" min="0" value="" oninput="calculateAmount(this)" style="width: 60px;"></td>
+                <td><input type="text" name="details[2].unitName" readonly size="5"></td>
+                <td><input type="number" name="details[2].unitPrice" oninput="calculateAmount(this)" style="width: 80px;"></td>
+                <td><input type="text" name="details[2].amount" readonly class="align-right" size="10"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+
+    <table style="margin-left: auto;">
+        <thead>
+            <tr>
+                <th>数量計</th>
+                <th>金額計</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" id="suryokei" name="suryokei" size="14" readonly class="align-right"></td>
+                <td><input type="text" id="kingakukei" name="kingakukei" size="18" readonly class="align-right"></td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <hr>
+
+    <div class="btn-area">
+        <button type="submit" class="btn" style="background-color: #4CAF50; color: white; border: none;">登録する</button>
+        <input type="button" class="btn" value="クリア" onclick="clearForm()">
+        <button type="button" class="btn" onclick="location.href='/juchu/input'">リセット</button>
+    </div>
+
+    <div class="btn-area">
+        <a th:href="@{/}"
+            class="btn"
+            style="display: inline-block; text-decoration: none;">
+            戻る
+        </a>
+    </div>
+
+</form>
+
+<script th:inline="javascript">
+let currentTenpoList = [];
+
+// お得意先検索
+document.getElementById('tokuiSearch').addEventListener('input', function() {
+
+    const keyword = this.value.trim().toLowerCase();
+
+    const tokuiSelect = document.getElementById('tokuiNo');
+
+    // 現在選択されている番号を保存
+    const currentValue = tokuiSelect.value;
+
+    // サーバーから読み込んだ全候補を保存
+    if (!tokuiSelect.dataset.allOptions) {
+        const allOptions = [];
+
+        for (let i = 0; i < tokuiSelect.options.length; i++) {
+
+            const option = tokuiSelect.options[i];
+
+            if (option.value === '') {
+                continue;
+            }
+
+            allOptions.push({
+                no: option.value,
+                name: option.getAttribute('data-name') || '',
+                text: option.textContent
+            });
+        }
+
+        tokuiSelect.dataset.allOptions =
+            JSON.stringify(allOptions);
+    }
+
+    const allOptions =
+        JSON.parse(tokuiSelect.dataset.allOptions);
+
+    // ドロップダウンをいったんクリア
+    tokuiSelect.innerHTML = '';
+
+    // 「選択してください」
+    const emptyOption = document.createElement('option');
+    emptyOption.value = '';
+    emptyOption.textContent = '選択してください';
+    tokuiSelect.appendChild(emptyOption);
+
+    // 検索結果だけを追加
+    allOptions.forEach(function(tokui) {
+
+        const noText = tokui.no.toLowerCase();
+        const nameText = tokui.name.toLowerCase();
+
+        if (
+            keyword === '' ||
+            noText.includes(keyword) ||
+            nameText.includes(keyword)
+        ) {
+
+            const option = document.createElement('option');
+
+            option.value = tokui.no;
+            option.textContent = tokui.text;
+            option.setAttribute('data-name', tokui.name);
+
+            tokuiSelect.appendChild(option);
+        }
+    });
+
+    // 以前選択していた番号が検索結果に残っていれば選択
+    for (let i = 0; i < tokuiSelect.options.length; i++) {
+
+        if (tokuiSelect.options[i].value === currentValue) {
+            tokuiSelect.value = currentValue;
+            break;
+        }
+    }
+});
+
+
+// 担当番号入力時の名前自動セット
+function selectTanto() {
+    const val = document.getElementById("tantoNo").value;
+    const options = document.getElementById("tantoList").options;
+    let name = "";
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === val) {
+            name = options[i].getAttribute("data-name");
+            break;
+        }
+    }
+    if (name) {
+        document.getElementById("tantoName").value = name;
+    }
+}
+
+// 部門番号入力時の名前自動セット
+function selectBumon() {
+    const val = document.getElementById("bumonNo").value;
+    const options = document.getElementById("bumonOptions").options;
+    let name = "";
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === val) {
+            name = options[i].getAttribute("data-name") || options[i].label;
+            break;
+        }
+    }
+    if (name) {
+        document.getElementById("bumonName").value = name;
+    }
+}
+
+// お得意先選択時の処理
+// お得意先名セット ＋ 店舗一覧の非同期取得
+document.getElementById('tokuiNo').addEventListener('change', function() {
+
+    const tokuiNo = this.value.trim();
+
+    const selectedOption =
+        this.options[this.selectedIndex];
+
+    const tokuiNameInput =
+        document.getElementById('tokuiName');
+
+    const tenpoDatalist =
+        document.getElementById('tenpoList');
+
+    const tenpoNoInput =
+        document.getElementById('tenpoNo');
+
+    const tenpoNameInput =
+        document.getElementById('tenpoName');
+
+
+    // =========================
+    // お得意先名をセット
+    // =========================
+
+    let matchedName = "";
+
+    if (selectedOption) {
+        matchedName =
+            selectedOption.getAttribute('data-name') || "";
+    }
+
+    tokuiNameInput.value = matchedName;
+
+    // 選択後のお得意先番号は番号だけ表示
+    if (selectedOption && tokuiNo) {
+        selectedOption.textContent = tokuiNo;
+    }
+
+
+    // =========================
+    // お得意先が未選択の場合
+    // =========================
+
+    if (!tokuiNo) {
+
+        currentTenpoList = [];
+
+        tenpoDatalist.innerHTML = "";
+
+        tenpoNoInput.value = "";
+
+        tenpoNameInput.value = "";
+
+        return;
+    }
+
+
+    // =========================
+    // 店舗一覧を取得
+    // =========================
+
+    fetch(
+        `/juchu/api/stores?tokuiNo=${encodeURIComponent(tokuiNo)}`
+    )
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error(
+                '店舗一覧の取得に失敗しました'
+            );
+        }
+
+        return response.json();
+    })
+    .then(data => {
+
+        currentTenpoList = data;
+
+        tenpoDatalist.innerHTML = "";
+
+        tenpoNoInput.value = "";
+
+        tenpoNameInput.value = "";
+
+
+        data.forEach(tenpo => {
+
+            const code = tenpo.tenpoNo;
+
+            const name =
+                tenpo.tenpoName || "";
+
+
+            const option =
+                document.createElement('option');
+
+            option.value = code;
+
+            option.label = name;
+
+            option.setAttribute(
+                'data-name',
+                name
+            );
+
+            tenpoDatalist.appendChild(option);
+        });
+    })
+    .catch(error => {
+
+        console.error(
+            '店舗取得エラー:',
+            error
+        );
+    });
+
+    // =========================
+    // 商品一覧をお得意先で絞り込む
+    // =========================
+
+    document.querySelectorAll('.detail-row').forEach(row => {
+
+        const searchInput =
+            row.querySelector('.hin-search');
+
+        if (searchInput) {
+            filterHinmei(searchInput);
+        }
+
+    });
+
+});
+
+
+// 店舗番号入力時の名前自動セット
+function selectTenpo() {
+    const val = document.getElementById("tenpoNo").value;
+    const found = currentTenpoList.find(t => String(t.tenpoNo || t.tenpoCode) === String(val));
+    if (found) {
+        document.getElementById("tenpoName").value = found.tenpoName || found.tenName || "";
+    }
+}
+
+
+// 品名検索フィルター
+function filterHinmei(inputObj) {
+    const keyword = inputObj.value.toLowerCase();
+
+    // 現在選択されているお得意先番号
+    const tokuiNo = document.getElementById("tokuiNo").value;
+
+    const row = inputObj.closest('.detail-row');
+    const select = row.querySelector('.search-select');
+    const options = select.options;
+
+    for (let i = 1; i < options.length; i++) {
+
+        const text = options[i].text.toLowerCase();
+
+        const name = options[i].getAttribute("data-name")
+            ? options[i].getAttribute("data-name").toLowerCase()
+            : "";
+
+        // 商品マスターのお得意先番号
+        const optionTokuiNo =
+            options[i].getAttribute("data-tokui-no");
+
+        // お得意先番号が一致するか
+        const tokuiMatch =
+            String(optionTokuiNo) === String(tokuiNo);
+
+        // 品名検索が一致するか
+        // 空欄なら全商品を対象にする
+        const keywordMatch =
+            keyword === ""
+            || text.includes(keyword)
+            || name.includes(keyword);
+
+        // 両方一致した商品だけ表示
+        options[i].style.display =
+            (tokuiMatch && keywordMatch) ? "" : "none";
+    }
+}
+
+
+// 品番選択時の処理
+function selectHinban(selectObj) {
+    const row = selectObj.closest('.detail-row');
+    const selectedOption = selectObj.options[selectObj.selectedIndex];
+    
+    const hinmeiInput = row.querySelector('[name$=".hinmei"]');
+    const qtyInput = row.querySelector('[name$=".quantity"]');
+    const taniInput = row.querySelector('[name$=".unitName"]');
+    const tankaInput = row.querySelector('[name$=".unitPrice"]');
+    
+    if (selectedOption && selectedOption.value !== "") {
+        hinmeiInput.value = selectedOption.getAttribute("data-name") || "";
+        tankaInput.value = selectedOption.getAttribute("data-tanka") || 0;
+        taniInput.value = selectedOption.getAttribute("data-tani") || "";
+        if (!qtyInput.value) qtyInput.value = 1;
+
+        // 品番欄には品番だけを表示
+        selectedOption.textContent = selectedOption.value;
+
+    } else {
+        hinmeiInput.value = "";
+        tankaInput.value = "";
+        taniInput.value = "";
+        qtyInput.value = "";
+    }
+    calculateAmount(qtyInput);
+}
+
+
+// 金額計算
+function calculateAmount(inputObj) {
+    const row = inputObj.closest('.detail-row');
+    const qty = parseFloat(row.querySelector('[name$=".quantity"]').value) || 0;
+    const price = parseFloat(row.querySelector('[name$=".unitPrice"]').value) || 0;
+    const amountInput = row.querySelector('[name$=".amount"]');
+
+    const amount = qty * price;
+    amountInput.value = amount;
+    updateTotals();
+}
+
+
+// 合計計算
+function updateTotals() {
+    let totalQty = 0;
+    let totalAmount = 0;
+    
+    document.querySelectorAll('.detail-row').forEach(row => {
+        totalQty += parseFloat(row.querySelector('[name$=".quantity"]').value) || 0;
+        totalAmount += parseFloat(row.querySelector('[name$=".amount"]').value) || 0;
+    });
+    
+    document.getElementById('suryokei').value = totalQty > 0 ? totalQty : "";
+    document.getElementById('kingakukei').value = totalAmount > 0 ? totalAmount : "";
+}
+
+// 初期化処理
+window.onload = function() {
+    selectTanto();
+    selectBumon();
+
+    document.querySelectorAll('.detail-row .search-select').forEach(select => {
+        if (select.value !== "") selectHinban(select);
+    });
+};
+
+function clearForm() {
+    document.querySelectorAll('form input[type="text"], form input[type="date"], form input[type="number"]').forEach(input => input.value = "");
+    document.querySelectorAll('form select').forEach(select => select.selectedIndex = 0);
+    const tekiyo = document.querySelector('input[name="tekiyo"]');
+    if (tekiyo) tekiyo.value = "";
+    updateTotals();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>受注伝票</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #999;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+
+        td {
+            background-color: white;
+        }
+
+        .header-table {
+            width: 100%;
+        }
+
+        .header-table th {
+            width: 140px;
+        }
+
+        .header-table td {
+            width: 220px;
+        }
+
+        .align-right {
+            text-align: right;
+        }
+
+        .btn-area {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>受注伝票</h2>
+
+
+<!-- レコード移動 -->
+<div style="margin-bottom: 20px;">
+
+    <!-- 最初のレコード -->
+    <a th:if="${firstDenpyoId != null}"
+       th:href="@{/order/slip(denpyoId=${firstDenpyoId})}"
+       style="margin-right: 25px;">
+        |&lt;
+    </a>
+
+    <!-- 前のレコード -->
+    <a th:if="${previousDenpyoId != null}"
+       th:href="@{/order/slip(denpyoId=${previousDenpyoId})}"
+       style="margin-right: 25px;">
+        &lt;
+    </a>
+
+    <!-- 前のレコードがない場合 -->
+    <a th:if="${previousDenpyoId == null}"
+       href="#"
+       onclick="alert('移動できません'); return false;"
+       style="margin-right: 25px;">
+       &lt;
+    </a>
+
+    <!-- 現在位置 / 全件数 -->
+    <span th:text="${currentPosition + '/' + totalCount}"
+          style="margin-right: 25px;">
+        1/236
+    </span>
+
+    <!-- 次のレコード -->
+    <a th:if="${nextDenpyoId != null}"
+    th:href="@{/order/slip(denpyoId=${nextDenpyoId})}"
+    style="margin-right: 25px;">
+        &gt;
+    </a>
+
+    <!-- 次のレコードがない場合 -->
+    <a th:if="${nextDenpyoId == null}"
+    href="#"
+    onclick="alert('移動できません'); return false;"
+    style="margin-right: 25px;">
+        &gt;
+    </a>
+
+    <!-- 最後のレコード -->
+    <a th:if="${lastDenpyoId != null}"
+       th:href="@{/order/slip(denpyoId=${lastDenpyoId})}"
+       style="margin-right: 25px;">
+        &gt;|
+    </a>
+
+    <!-- 新規受注伝票 -->
+    <a th:href="@{/juchu/slip}">
+        &gt;*
+    </a>
+
+</div>
+
+<!-- 伝票基本情報 -->
+<table class="header-table">
+
+    <tr>
+        <th>伝票ID</th>
+        <td th:text="${header.denpyoId}"></td>
+
+        <th>伝票番号</th>
+        <td th:text="${header.denpyoNo}"></td>
+    </tr>
+
+    <tr>
+        <th>受注日</th>
+        <td th:text="${header.juchuDate}"></td>
+
+        <th>製造日</th>
+        <td th:text="${header.seizoDate}"></td>
+    </tr>
+
+    <tr>
+        <th>納品日</th>
+        <td th:text="${header.nouhinDate}"></td>
+
+        <th>担当者番号</th>
+        <td th:text="${header.tantoNo}"></td>
+    </tr>
+
+    <tr>
+        <th>担当者名</th>
+        <td th:text="${header.tantoName}"></td>
+
+        <th>お得意先番号</th>
+        <td th:text="${header.tokuiNo}"></td>
+    </tr>
+
+    <tr>
+        <th>お得意先名</th>
+        <td th:text="${header.tokuiName}"></td>
+
+        <th>部門番号</th>
+        <td th:text="${header.bumonNo}"></td>
+    </tr>
+
+    <tr>
+        <th>部門名</th>
+        <td th:text="${header.bumonName}"></td>
+
+        <th>店舗番号</th>
+        <td th:text="${header.tenpoNo}"></td>
+    </tr>
+
+    <tr>
+        <th>店舗名</th>
+        <td th:text="${header.tenpoName}"></td>
+
+        <th>摘要</th>
+        <td th:text="${header.tekiyo}"></td>
+    </tr>
+
+</table>
+
+<hr>
+
+<h3>明細情報</h3>
+
+<!--
+    次の段階で x19_detail の明細を
+    ここに表示します。
+-->
+
+<table>
+    <thead>
+        <tr>
+            <th>商品番号</th>
+            <th>商品名</th>
+            <th>規格</th>
+            <th>数量</th>
+            <th>単位</th>
+            <th>単価</th>
+            <th>金額</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        <tr th:each="detail : ${detailList}">
+
+            <td th:text="${detail.hinban}"></td>
+
+            <td th:text="${detail.hinmei}"></td>
+
+            <td th:text="${detail.kikaku}"></td>
+
+            <td class="align-right"
+                th:text="${detail.quantity}"></td>
+
+            <td th:text="${detail.unitName}"></td>
+
+            <td class="align-right"
+                th:text="${detail.unitPrice}"></td>
+
+            <td class="align-right"
+                th:text="${detail.amount}"></td>
+
+        </tr>
+
+    </tbody>
+
+</table>
+
+<!-- 受注伝票削除 -->
+<div class="btn-area" style="margin-bottom: 10px;">
+    <form th:action="@{/order/delete}" method="post"
+        th:onsubmit="'return confirm(\'この受注伝票を削除します。\\n\\n伝票ID：' + ${header.denpyoId} + '\\n\\nよろしいですか？\');'">
+
+        <input type="hidden"
+               name="denpyoId"
+               th:value="${header.denpyoId}">
+
+        <button type="submit"
+                class="btn"
+                style="background-color: #d9534f; color: white;">
+            この受注伝票を削除
+        </button>
+
+    </form>
+</div>
+
+
+<div class="btn-area">
+    <a th:href="@{/order/list}" class="btn">
+        戻る
+    </a>
+</div>
+
+</body>
+</html>

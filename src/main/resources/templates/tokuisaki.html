@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>得意先マスター保守</title>
+    <style>
+        table { border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 6px 12px; }
+        th { background-color: #f2f2f2; }
+        .btn-danger { color: red; }
+    </style>
+</head>
+<body>
+
+    <a href="/">&larr; メニューへ戻る</a>
+    <h2>得意先マスター保守</h2>
+
+    <!-- 入力フォーム -->
+    <h3 th:text="${isEdit} ? '得意先情報 編集' : '得意先情報 入力'">得意先情報 入力</h3>
+    <form th:action="@{/tokuisaki/save}" th:object="${tokuiMaster}" method="post">
+        
+        <div>
+            <label for="tokuiNo">得意先CD:</label>
+            <!-- 編集時は主キーを変更不可（readonly）にし、新規時は入力可能にする -->
+            <input type="number" id="tokuiNo" th:field="*{tokuiNo}" th:readonly="${isEdit}" required />
+        </div>
+        
+        <div>
+            <label for="tokuiName">得意先名:</label>
+            <input type="text" id="tokuiName" th:field="*{tokuiName}" required />
+        </div>
+
+        <button type="submit" th:text="${isEdit} ? '更新' : '保存'">保存</button>
+        <a th:if="${isEdit}" th:href="@{/tokuisaki}">キャンセル</a>
+    </form>
+
+    <hr>
+
+    <!-- 登録済み一覧 -->
+    <h3>登録済み得意先一覧</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>得意先CD</th>
+                <th>得意先名</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="tokui : ${tokuiList}">
+                <td th:text="${tokui.tokuiNo}">1210</td>
+                <td th:text="${tokui.tokuiName}">大阪ファミリーストア</td>
+                <td>
+                    <!-- 編集ボタン -->
+                    <a th:href="@{/tokuisaki/edit/{id}(id=${tokui.tokuiNo})}">編集</a>
+                    
+                    <!-- 削除ボタン（誤操作防止のためJavaScript確認ダイアログ付き） -->
+                    <form th:action="@{/tokuisaki/delete/{id}(id=${tokui.tokuiNo})}" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('本当に削除しますか？');" class="btn-danger">削除</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>受注伝票一覧</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <h1>受注伝票一覧</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>伝票ID</th>
+                <th>受注日</th>
+                <th>得意先名</th>
+                <th>部門名</th>
+                <th>店舗名</th>
+                <th>担当者</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="order : ${orders}">
+                <td th:text="${order.denpyoId}">1</td>
+                <td th:text="${order.juchuDate}">2031-01-15</td>
+                <td th:text="${order.tokuiName}">得意先A</td>
+                <td th:text="${order.bumonName}">農産部</td>
+                <td th:text="${order.tenpoName}">天六店</td>
+                <td th:text="${order.tantoName}">すい</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

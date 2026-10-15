@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CSVアップロード</title>
+</head>
+<body>
+
+    <!-- 画面上部のナビゲーションリンク -->
+    <div class="nav-links">
+        <a th:href="@{/}">← メインメニューへ戻る</a>
+        <a th:href="@{/juchu/slip}">➔ 受注伝票入力へ戻る</a>
+    </div>
+
+    <h2>受注伝票 CSVアップロード</h2>
+
+    <!-- メッセージ表示領域 -->
+    <div th:if="${message}" style="color: blue; margin-bottom: 10px;">
+        <p th:text="${message}"></p>
+    </div>
+
+    <form th:action="@{/csv_upload}" method="POST" enctype="multipart/form-data">
+        
+        <!-- 担当者コード（補完入力） -->
+        <div style="margin-bottom: 10px;">
+            <label for="tanto">担当者:</label>
+            <input type="text" id="tanto" name="tantoNo" list="tantoOptions" placeholder="手入力または選択" oninput="selectTanto()">
+
+            <datalist id="tantoOptions">
+                <option th:each="tanto : ${tantoList}" 
+                        th:value="${tanto.tantoNo}" 
+                        th:data-name="${tanto.tantoName}"
+                        th:label="${tanto.tantoName}">
+                </option>
+            </datalist>
+        </div>
+
+        <!-- 担当者名（選択時に自動で名前が入るよう readonly を推奨） -->
+        <div style="margin-bottom: 10px;">
+            <label for="tantoName">担当者名:</label>
+            <input type="text" id="tantoName" name="tantoName" size="15" >
+        </div>
+
+        <!-- 製造日設定 -->
+        <div style="margin-bottom: 10px;">
+            <label for="seizobiSettei">製造日設定:</label>
+            <select id="seizobiSettei" name="seizobiSettei">
+                <option value="0">納品日 (0)</option>
+                <option value="-1">1日前 (-1)</option>
+            </select>
+        </div>
+
+        <!-- CSVファイル選択 -->
+        <div style="margin-bottom: 10px;">
+            <label for="file">CSVファイル:</label>
+            <input type="file" id="file" name="file" accept=".csv" required>
+        </div>
+
+        <button type="submit">アップロード</button>
+    </form>
+
+    <!-- 担当番号選択時に担当者名を自動補完するJavaScript -->
+    <script>
+    function selectTanto() {
+        const inputVal = document.getElementById('tanto').value;
+        const options = document.querySelectorAll('#tantoOptions option');
+        const nameField = document.getElementById('tantoName'); // ※担当者名の入力項目IDに合わせて変更してください
+
+        let found = false;
+
+        // datalistの選択肢と一致するかチェック
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === inputVal) {
+                // 一致した場合のみ、担当者名を自動設定
+                if (nameField) {
+                    nameField.value = options[i].getAttribute('data-name');
+                }
+                found = true;
+                break;
+            }
+        }
+
+        // 手入力中で一致しない場合は、自動セットを行わない（入力を妨げない）
+        if (!found) {
+            // 必要に応じて名前欄をクリアする、あるいはそのまま手入力を許容する
+            // if (nameField) nameField.value = '';
+        }
+    }
+    </script>
+
+</body>
+</html>

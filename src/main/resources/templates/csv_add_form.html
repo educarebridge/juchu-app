@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <meta charset="UTF-8"> 
+    <title>読込みデータ追加</title>
+
+<style>
+    body {
+        font-family: sans-serif;
+        margin: 40px;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: auto;
+    }
+
+    .message, .success-message {
+        color: green;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .error, .warning-message {
+        color: red;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 15px 30px;
+        margin: 10px 10px 10px 0;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-add {
+        background-color: #4caf50;
+        color: white;
+    }
+
+    .btn-back {
+        background-color: #777;
+        color: white;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>読込みデータ追加</h1>
+
+<p>
+    x19_headerwork のデータを
+    x19_header へ追加登録します。
+</p>
+
+<!-- 成功メッセージ -->
+<div th:if="${message}" class="message">
+    <p th:text="${message}"></p>
+</div>
+
+<!-- エラーメッセージ -->
+<div th:if="${errorMessage}" class="error">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<hr>
+
+<!-- ① 登録完了前の画面 -->
+<div th:if="${isSuccess == null}">
+
+    <!-- 追加対象件数の表示（全体件数と重複件数） -->
+    <div style="background-color: #f8f9fa; border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+        <p style="margin: 5px 0;"><strong>【追加データの確認】</strong></p>
+        <p style="margin: 5px 0;">追加対象のデータ件数：<strong th:text="${workCount}">0</strong> 件</p>
+        <p style="margin: 5px 0; color: red;" th:if="${existCount > 0}">
+            ※うち、既に登録済みの重複データ：<strong th:text="${existCount}">0</strong> 件
+        </p>
+        <p style="margin: 5px 0; color: green;" th:if="${existCount == 0}">
+            ※重複するデータはありません。
+        </p>
+    </div>
+
+    <!-- 追加登録フォーム（JavaScriptによる連打防止付き） -->
+    <form th:action="@{/csv/add-header}" method="post" onsubmit="return stopDoubleSubmit(this);">
+        <button type="submit" class="btn btn-add">受注伝票を追加登録</button>
+        <a th:href="@{/csv/menu}" class="btn btn-back">CSVメニューへ戻る</a>
+    </form>
+</div>
+
+<!-- ② 登録完了後の画面（「CSVメニューへ戻る」ボタンのみ表示） -->
+<div th:if="${isSuccess == true}">
+    <p class="success-message">登録が正常に完了しました。</p>
+
+    <!-- CSVメニューへ戻るボタンのみを表示（連打されて登録が重複するのを防止） -->
+    <a th:href="@{/csv/menu}" class="btn btn-back">CSVメニューへ戻る</a>
+</div>
+
+</div>
+
+<!-- 連打防止JavaScript -->
+<script>
+function stopDoubleSubmit(form) {
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = '処理中...';
+    }
+    return true;
+}
+</script>
+
+</body>
+</html>

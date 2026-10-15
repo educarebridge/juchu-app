@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CSV読込みデータ詳細</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 7px 12px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-right: 8px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>CSV読込みデータ詳細</h2>
+
+    <div style="margin-bottom: 15px;">
+        <a th:href="@{/order/list}" class="btn">
+            ← 読込みデータ一覧へ戻る
+        </a>
+    </div>
+
+    <table>
+        <tr>
+            <th>伝票ID</th>
+            <td th:text="${header.denpyoId}">236</td>
+        </tr>
+
+        <tr>
+            <th>伝票番号</th>
+            <td th:text="${header.denpyoNo}">055919674</td>
+        </tr>
+
+        <tr>
+            <th>担当者番号</th>
+            <td th:text="${header.tantoNo}">1</td>
+        </tr>
+
+        <tr>
+            <th>担当者名</th>
+            <td th:text="${header.tantoName}">すい</td>
+        </tr>
+
+        <tr>
+            <th>受注日</th>
+            <td th:text="${header.juchuDate}">2033-01-19</td>
+        </tr>
+
+        <tr>
+            <th>製造日</th>
+            <td th:text="${header.seizoDate}">2033-01-19</td>
+        </tr>
+
+        <tr>
+            <th>納品日</th>
+            <td th:text="${header.nouhinDate}">2033-01-20</td>
+        </tr>
+
+        <tr>
+            <th>お得意先番号</th>
+            <td th:text="${header.tokuiNo}">8820</td>
+        </tr>
+
+        <tr>
+            <th>お得意先名</th>
+            <td th:text="${header.tokuiName}">大阪オアシス</td>
+        </tr>
+
+        <tr>
+            <th>部門番号</th>
+            <td th:text="${header.bumonNo}">21</td>
+        </tr>
+
+        <tr>
+            <th>部門名</th>
+            <td th:text="${header.bumonName}">農産部</td>
+        </tr>
+
+        <tr>
+            <th>店舗番号</th>
+            <td th:text="${header.tenpoNo}">65</td>
+        </tr>
+
+        <tr>
+            <th>店舗名</th>
+            <td th:text="${header.tenpoName}">甲陽園店</td>
+        </tr>
+    </table>
+
+    <h3>明細</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>明細ID</th>
+                <th>商品番号</th>
+                <th>商品番号2</th>
+                <th>商品番号3</th>
+                <th>商品名</th>
+                <th>規格</th>
+                <th>発注単位</th>
+                <th>数量</th>
+                <th>単位</th>
+                <th>単価</th>
+                <th>金額</th>
+            </tr>
+        </thead>
+
+        <tbody>
+                <tr th:each="detail : ${detailList}">
+                <td th:text="${detail.meisaiId}">1</td>
+                <td th:text="${detail.hinban}">商品番号</td>
+                <td th:text="${detail.hinban2}">商品番号2</td>
+                <td th:text="${detail.hinban3}">商品番号3</td>
+                <td th:text="${detail.hinmei}">商品名</td>
+                <td th:text="${detail.kikaku}">規格</td>
+                <td th:text="${detail.hacchuTani}">1</td>
+                <td th:text="${detail.quantity}">10</td>
+                <td th:text="${detail.unitName}">個</td>
+                <td th:text="${detail.unitPrice}">100</td>
+                <td th:text="${detail.amount}">1000</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

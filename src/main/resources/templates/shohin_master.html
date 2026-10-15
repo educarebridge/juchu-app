@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>商品マスター管理</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f8f9fa; }
+        h1, h2 { color: #333; }
+        .container { display: flex; gap: 20px; }
+        .form-area { width: 350px; background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .list-area { flex-grow: 1; background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 3px; }
+        .form-group input { width: 100%; padding: 6px; box-sizing: border-box; }
+        .btn { padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background-color: #0056b3; }
+        .btn-cancel { background-color: #6c757d; text-decoration: none; color: white; padding: 8px 16px; border-radius: 4px; font-size: 13px; display: inline-block; }
+        .btn-delete { background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-delete:hover { background-color: #bd2130; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #e9ecef; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        /* ★操作セル用CSS：折り返しを防止し、横並びに配置します */
+        .action-cell { 
+            white-space: nowrap; 
+            display: flex; 
+            gap: 5px; 
+            align-items: center; 
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>商品マスター管理</h1>
+
+<p><a th:href="@{/}" style="text-decoration: none; color: #007bff;">← メインメニューへ戻る</a></p>
+
+<div class="container">
+    <!-- 入力・編集フォーム -->
+    <div class="form-area">
+        <h2 th:text="${isEdit} ? '商品情報の編集' : '新規商品の登録'">登録フォーム</h2>
+        
+        <form th:action="@{/shohin/save}" th:object="${shohinForm}" method="post">
+            
+            <div class="form-group">
+                <label>得意先No (主キー)</label>
+                <input type="number" th:field="*{tokuiNo}" th:readonly="${isEdit}" required>
+            </div>
+
+            <div class="form-group">
+                <label>得意先名</label>
+                <input type="text" th:field="*{tokuiName}">
+            </div>
+
+            <div class="form-group">
+                <label>品番 (主キー)</label>
+                <input type="text" th:field="*{hinban}" th:readonly="${isEdit}" required>
+            </div>
+
+            <div class="form-group">
+                <label>品番2</label>
+                <input type="text" th:field="*{hinban2}">
+            </div>
+
+            <div class="form-group">
+                <label>品名</label>
+                <input type="text" th:field="*{hinmei}" required>
+            </div>
+
+            <div class="form-group">
+                <label>単価</label>
+                <input type="number" th:field="*{unitPrice}">
+            </div>
+
+            <div class="form-group">
+                <label>単位名</label>
+                <input type="text" th:field="*{unitName}">
+            </div>
+
+            <div class="form-group">
+                <label>規格</label>
+                <input type="text" th:field="*{kikaku}">
+            </div>
+
+            <div class="form-group">
+                <label>コンテナグループ</label>
+                <input type="number" th:field="*{containerGroup}">
+            </div>
+
+            <div class="form-group">
+                <label>ピッキング入数</label>
+                <input type="number" th:field="*{pickingIrisu}">
+            </div>
+
+            <div style="margin-top: 15px;">
+                <button type="submit" class="btn" th:text="${isEdit} ? '更新する' : '登録する'">保存</button>
+                <a th:if="${isEdit}" th:href="@{/shohin/list}" class="btn-cancel">キャンセル</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- 一覧表示領域 -->
+    <div class="list-area">
+        
+        <!-- 検索フォーム -->
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0; font-size: 1.1em;">商品検索</h3>
+            <form th:action="@{/shohin/list}" method="get" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <div>
+                    <label for="searchTokuiName">得意先名：</label>
+                    <input type="text" id="searchTokuiName" name="searchTokuiName" th:value="${param.searchTokuiName}" placeholder="例: オアシス">
+                </div>
+                <div>
+                    <label for="searchHinmei">品名：</label>
+                    <input type="text" id="searchHinmei" name="searchHinmei" th:value="${param.searchHinmei}" placeholder="例: 和風">
+                </div>
+                <div>
+                    <button type="submit" style="padding: 5px 15px;">検索</button>
+                    <a th:href="@{/shohin/list}" style="text-decoration: none;">
+                        <button type="button" style="padding: 5px 15px;">クリア（全件表示）</button>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <h2>商品マスターデータ一覧</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>得意先No</th>
+                    <th>得意先名</th>
+                    <th>品番</th>
+                    <th>品番2</th> <!-- 追加 -->
+                    <th>品名</th>
+                    <th>単価</th>
+                    <th>単位</th>
+                    <th>規格</th>
+                    <th>コンテナGP</th>
+                    <th>ピック入数</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${shohinList}">
+                    <td th:text="${item.tokuiNo}">1</td>
+                    <td th:text="${item.tokuiName}">得意先A</td>
+                    <td th:text="${item.hinban}">A-001</td>
+                    <td th:text="${item.hinban2}">4560448219366</td> <!-- 追加 -->
+                    <td th:text="${item.hinmei}">商品名称</td>
+                    <td th:text="${item.unitPrice}">1000</td>
+                    <td th:text="${item.unitName}">個</td>
+                    <td th:text="${item.kikaku}">100g</td>
+                    <td th:text="${item.containerGroup}">30</td>
+                    <td th:text="${item.pickingIrisu}">10</td>
+                    <td>
+                        <div class="action-cell">
+                            <a th:href="@{/shohin/list(tokuiNo=${item.tokuiNo}, hinban=${item.hinban})}">編集</a>
+                            
+                            <!-- ★【追加】削除用フォーム -->
+                            <form th:action="@{/shohin/delete}" method="post" onsubmit="return confirm('本当に削除しますか？');" style="margin: 0;">
+                                <input type="hidden" name="tokuiNo" th:value="${item.tokuiNo}">
+                                <input type="hidden" name="hinban" th:value="${item.hinban}">
+                                <button type="submit" class="btn-delete">削除</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>
