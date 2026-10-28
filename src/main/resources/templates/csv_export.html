@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>受注データCSV出力</title>
+</head>
+<body>
+    <h2>受注データ CSV出力</h2>
+    <form th:action="@{/csv_download}" method="post">
+        <p>下のボタンをクリックすると、受注伝票のCSVファイルがダウンロードされます。</p>
+        <button type="submit">CSVダウンロード</button>
+    </form>
+</body>
+</html>

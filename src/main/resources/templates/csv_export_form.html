@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>受注伝票 CSV出力</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 850px;
+            margin: 0 auto;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .form-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #555;
+        }
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-row input[type="text"],
+        .filter-row input[type="date"],
+        .filter-row select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .range-separator {
+            font-weight: bold;
+            font-size: 16px;
+            margin: 5px 0 15px 0;
+            text-align: center;
+        }
+        /* ボタン配置スタイリング */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .btn-download {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-download:hover {
+            background-color: #45a049;
+        }
+        .btn-back {
+            background-color: #757575;
+            color: white;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        .btn-back:hover {
+            background-color: #616161;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>受注伝票 CSVデータ出力</h2>
+
+    <form th:action="@{/csv-export/download}" th:object="${csvExportForm}" method="post">
+        
+        <!-- 1. お得意先番号による範囲指定 -->
+        <div class="form-section">
+            <h3>お得意先 範囲選択 (開始 ～ 終了)</h3>
+            
+            <!-- 開始お得意先 -->
+            <div class="filter-row">
+                <label style="width: 50px; font-weight: bold;">開始：</label>
+                
+                <!-- ① 検索キーワード入力 -->
+                <input type="text" id="startTokuiSearch" placeholder="検索（例: ファミ）" size="14" autocomplete="off" oninput="filterOptions('startTokuiSearch', 'startTokuiNo')">
+                
+                <!-- ② 得意先番号選択（ドロップダウン） -->
+                <select th:field="*{startTokuiNo}" id="startTokuiNo" onchange="updateName('startTokuiNo', 'startTokuiName')">
+                    <option value="">全件から選択</option>
+                    <option th:each="tokui : ${tokuiList}"
+                            th:value="${tokui.tokuiNo}"
+                            th:data-name="${tokui.tokuiName}"
+                            th:text="|${tokui.tokuiNo} : ${tokui.tokuiName}|">
+                    </option>
+                </select>
+
+                <!-- ③ 得意先名表示（自動入力） -->
+                <input type="text" th:field="*{startTokuiName}" id="startTokuiName" readonly size="24" placeholder="開始お得意先名" style="background-color: #eef2f5;">
+            </div>
+
+            <div class="range-separator">～</div>
+
+            <!-- 終了お得意先 -->
+            <div class="filter-row">
+                <label style="width: 50px; font-weight: bold;">終了：</label>
+                
+                <!-- ① 検索キーワード入力 -->
+                <input type="text" id="endTokuiSearch" placeholder="検索（例: ストア）" size="14" autocomplete="off" oninput="filterOptions('endTokuiSearch', 'endTokuiNo')">
+                
+                <!-- ② 得意先番号選択（ドロップダウン） -->
+                <select th:field="*{endTokuiNo}" id="endTokuiNo" onchange="updateName('endTokuiNo', 'endTokuiName')">
+                    <option value="">全件から選択</option>
+                    <option th:each="tokui : ${tokuiList}"
+                            th:value="${tokui.tokuiNo}"
+                            th:data-name="${tokui.tokuiName}"
+                            th:text="|${tokui.tokuiNo} : ${tokui.tokuiName}|">
+                    </option>
+                </select>
+
+                <!-- ③ 得意先名表示（自動入力） -->
+                <input type="text" th:field="*{endTokuiName}" id="endTokuiName" readonly size="24" placeholder="終了お得意先名" style="background-color: #eef2f5;">
+            </div>
+        </div>
+
+        <!-- 2. 納品日による範囲指定 -->
+        <div class="form-section">
+            <h3>納品日 範囲選択</h3>
+            <div class="filter-row">
+                <label for="startDeliveryDate">納品日：</label>
+                <input type="date" th:field="*{startDeliveryDate}" id="startDeliveryDate">
+                <span style="margin: 0 10px;">～</span>
+                <input type="date" th:field="*{endDeliveryDate}" id="endDeliveryDate">
+            </div>
+        </div>
+
+        <!-- 3. ボタン配置（左：メニューに戻る / 右：CSVダウンロード） -->
+        <div class="btn-group">
+            <a th:href="@{/}" class="btn-back">← メニューに戻る</a>
+            <button type="submit" class="btn-download">CSVダウンロード</button>
+        </div>
+
+    </form>
+</div>
+
+<!-- JavaScript (リアルタイム検索・自動名称セット) -->
+<script>
+    // 検索文字列によるドロップダウンの動的絞り込み
+    function filterOptions(searchInputId, selectId) {
+        const searchText = document.getElementById(searchInputId).value.toLowerCase();
+        const select = document.getElementById(selectId);
+        const options = select.options;
+
+        for (let i = 0; i < options.length; i++) {
+            const optionText = options[i].text.toLowerCase();
+            // 初期選択肢("全件から選択")は常に表示
+            if (options[i].value === "") {
+                options[i].style.display = "";
+                continue;
+            }
+            if (optionText.includes(searchText)) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    }
+
+    // 選択された得意先番号と名称を反映
+    function updateName(selectId, nameInputId) {
+        const select = document.getElementById(selectId);
+        const nameInput = document.getElementById(nameInputId);
+        const selectedOption = select.options[select.selectedIndex];
+
+        if (selectedOption && selectedOption.value !== "") {
+            select.value = selectedOption.value;
+            nameInput.value = selectedOption.dataset.name || "";
+        } else {
+            nameInput.value = "";
+        }
+    }
+
+</script>
+
+</body>
+</html>

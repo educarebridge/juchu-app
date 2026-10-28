@@ -90,7 +90,13 @@
         .btn-info       { background-color: #17a2b8; }
         .btn-secondary  { background-color: #6c757d; }
         .btn-disabled   { background-color: #ced4da; color: #6c757d; pointer-events: none; box-shadow: none; }
-        
+
+        .btn-csv-light {
+            background: linear-gradient(135deg, #9b51e0, #7048e8);
+            color: #ffffff;
+        }
+
+
         /* ★ド派手なパワフルCSVボタン（ネオンパープル〜マゼンタグラデーション） */
         .btn-csv { 
             background: linear-gradient(135deg, #8e2de2, #4a00e0);
@@ -123,49 +129,50 @@
 </head>
 <body>
 
+
 <div class="menu-container">
     <h1>受注管理システム - メインメニュー</h1>
 
     <div class="menu-grid">
         
         <!-- 1列目：主要業務機能 -->
-        
-<div class="menu-column">
-    <div class="column-title">業務メニュー</div>
+        <div class="menu-column">
+            <div class="column-title">業務メニュー</div>
 
-    <!-- 受注伝票入力一覧 -->
-    <a th:href="@{/order/list}"
-       class="menu-btn btn-info">
-        受注伝票入力一覧
-    </a>
+            <!-- 受注伝票入力一覧 -->
+            <a th:href="@{/order/list}"
+               class="menu-btn btn-info">
+                受注伝票入力一覧
+            </a>
 
-    <!-- 受注伝票入力 -->
-    <a th:href="@{/juchu/slip}"
-       class="menu-btn btn-primary">
-        受注伝票入力
-    </a>
+            <!-- 受注伝票入力 -->
+            <a th:href="@{/juchu/slip}"
+               class="menu-btn btn-primary">
+                受注伝票入力
+            </a>
 
-    <!-- CSVデータ書出し（未作成） -->
-    <a href="#"
-       class="menu-btn btn-disabled"
-       onclick="alert('工事中です'); return false;">
-        CSVデータ書出し
-    </a>
+            <!-- CSVデータ読込み（順番入れ替え：上へ） -->
+            <a th:href="@{/csv/menu}"
+               class="menu-btn btn-csv">
+                CSVデータ読込み
+            </a>
 
-    <!-- CSVデータ読込み -->
-    <a th:href="@{/csv/menu}"
-       class="menu-btn btn-csv">
-        CSVデータ読込み
-    </a>
+            <!-- CSVデータ書出し（URLを修正し、ボタンデザインを変更） -->
+               <a th:href="@{/csv-export}"
+               class="menu-btn btn-csv">
+                CSVデータ書出し
+            </a>
 
-    <div style="margin-top: auto;"></div>
 
-    <!-- ログアウト -->
-    <a th:href="@{/logout}"
-       class="menu-btn btn-logout">
-        ログアウト
-    </a>
-</div>
+            <div style="margin-top: auto;"></div>
+
+            <!-- ログアウト -->
+            <a th:href="@{/logout}"
+               class="menu-btn btn-logout">
+                ログアウト
+            </a>
+        </div>
+
 
         <!-- 2列目：基本マスター（緑グラデーション） -->
         <div class="menu-column">
@@ -175,17 +182,22 @@
             <a th:href="@{/tenpo/list}" class="menu-btn btn-green-3">店舗マスター</a>
             <a th:href="@{/shohin/list}" class="menu-btn btn-green-4">商品マスター</a>
             <a th:href="@{/tanto/list}" class="menu-btn btn-green-5">担当マスター</a>
-            <a th:href="@{/center/list}" class="menu-btn btn-green-6">センターマスター</a>
-            <a th:href="@{/bin/list}" class="menu-btn btn-green-7">便マスター</a>
+            
+            <!-- 工事中リンクへ変更 -->
+            <a th:href="@{/under-construction}" class="menu-btn btn-green-6">センターマスター</a>
+            <a th:href="@{/under-construction}" class="menu-btn btn-green-7">便マスター</a>
         </div>
+
 
         <!-- 3列目：属性マスター（オレンジグラデーション） -->
         <div class="menu-column">
             <div class="column-title">品目・属性マスター</div>
-            <a th:href="@{/shohin-label/list}" class="menu-btn btn-orange-1">商品ラベルマスター</a>
-            <a th:href="@{/hinmoku/list}" class="menu-btn btn-orange-2">品目マスター</a>
-            <a th:href="@{/sanchi/list}" class="menu-btn btn-orange-3">産地マスター</a>
-            <a th:href="@{/dressing/list}" class="menu-btn btn-orange-4">ドレッシングマスター</a>
+            
+            <!-- 全て工事中リンクへ変更 -->
+            <a th:href="@{/under-construction}" class="menu-btn btn-orange-1">商品ラベルマスター</a>
+            <a th:href="@{/under-construction}" class="menu-btn btn-orange-2">品目マスター</a>
+            <a th:href="@{/under-construction}" class="menu-btn btn-orange-3">産地マスター</a>
+            <a th:href="@{/under-construction}" class="menu-btn btn-orange-4">ドレッシングマスター</a>
         </div>
 
     </div>
